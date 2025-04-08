@@ -8,7 +8,6 @@ import { formatNumber } from "../helpers/ad.js";
 import dayjs from "dayjs";
 import LikeUnlike from "../components/misc/LikeUnlike.js";
 import MapCard from "../components/cards/MapCard.js";
-import HTMLRenderer from "react-html-renderer";
 import AdCard from "../components/cards/AdCard.js";
 import ContactSeller from "../components/forms/ContactSeller.js";
 
@@ -79,7 +78,11 @@ export default function AdView() {
 
             <div className="mt-4">
               <h3 className="fw-bold">Description</h3>
-              <HTMLRenderer html={ad?.description?.replaceAll(".", "<br/>")} />
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: ad?.description?.replaceAll(".", "<br/>") || "",
+                }}
+              />
             </div>
           </div>
 
@@ -122,4 +125,3 @@ export default function AdView() {
     </>
   );
 }
-
