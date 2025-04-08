@@ -26,7 +26,7 @@ export default function AdView() {
 
   const fetchAd = async () => {
     try {
-      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/ad/${params.slug}`);
+      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/ad/${params.slug}`);
       console.log(data); 
       setAd(data?.ad);
       setRelated(data?.related); 

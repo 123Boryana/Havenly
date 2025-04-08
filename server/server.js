@@ -18,9 +18,12 @@ mongoose
 // middlewares
 app.use(express.json({ limit: "10mb" }));
 app.use(morgan("dev"));
-app.use(cors());
+app.use(cors({
+  origin: "https://havenly-git-main-boryana-projects-ta330183.vercel.app" 
+}));
 // routes middleware
 app.use("/api", authRoutes);
 app.use("/api", adRoutes);
 
-app.listen(8000, () => console.log("server_running_on_port_8000"));
+const PORT = process.env.PORT || 8000; // Use Vercel's PORT
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
