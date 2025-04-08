@@ -4,7 +4,7 @@ import NodeGeocoder from "node-geocoder";
 import dotenv from 'dotenv';
 dotenv.config();
 
-export const DATABASE = "mongodb://127.0.0.1:27017/realist";
+export const DATABASE = process.env.DATABASE;
 export const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
 export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 
