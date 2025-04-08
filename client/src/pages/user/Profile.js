@@ -20,8 +20,6 @@ export default function Profile() {
     const [loading, setLoading] = useState(false);
     const [photo, setPhoto] = useState(null);
     const [uploading, setUploading] = useState(false);
-    //hook
-    const navigate = useNavigate();
 
     useEffect(() => {
         if(auth.user) {
