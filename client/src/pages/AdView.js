@@ -26,19 +26,19 @@ export default function AdView() {
 
   const fetchAd = async () => {
     try {
-      const { data } = await axios.get(`/ad/${params.slug}`);
-      console.log(data); // Log the full response to check its structure
+      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/ad/${params.slug}`);
+      console.log(data); 
       setAd(data?.ad);
-      setRelated(data?.related); // Ensure 'related' is being set
+      setRelated(data?.related); 
     } catch (err) {
       console.log(err);
     }
   };
 
   const generatePhotosArray = (photos) => {
-    const defaultWidth = 4; // Set a fixed width
-    const defaultHeight = 3; // Set a fixed height
-  
+    const defaultWidth = 4; 
+    const defaultHeight = 3; 
+
     if (photos?.length > 0) {
       return photos.map((p) => ({
         src: p,
