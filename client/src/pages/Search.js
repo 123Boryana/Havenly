@@ -19,7 +19,7 @@ export default function Search() {
   
     const fetchAds = async () => {
       try {
-        const { data } = await axios.get("/ads");
+        const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/ads`);
         setAdsForSell(data.adsForSell);
         setAdsForRent(data.adsForRent);
       } catch (err) {

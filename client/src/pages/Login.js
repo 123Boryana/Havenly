@@ -23,7 +23,7 @@ export default function Login() {
     try {
       // console.log(email, password);
       setLoading(true);
-      const { data } = await axios.post(`/login`, {
+      const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
         email,
         password,
       });

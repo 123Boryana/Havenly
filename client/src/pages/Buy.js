@@ -7,19 +7,18 @@ import Banner from "../components/banner/Banner";
 import bannerPhoto from "../images/handshake-7346772_1280.jpg";
 
 export default function Buy() {
-    //context
+    // context
     const [auth, setAuth] = useAuth();
-    //state
+    // state
     const [ads, setAds] = useState();
-    
 
     useEffect(() => {
-        fetchAds()
-    }, [])
+        fetchAds();
+    }, []);
 
     const fetchAds = async () => {
-        try{
-            const {data} = await axios.get("/ads-for-sale");
+        try {
+            const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/ads-for-sale`);
             setAds(data);
         } catch (err) {
             console.log(err);
@@ -36,7 +35,7 @@ export default function Buy() {
             <div className="container">
                 <div className="row">
                     {ads?.map((ad) => (
-                        <AdCard ad={ad} key={ad._id}/>
+                        <AdCard ad={ad} key={ad._id} />
                     ))}
                 </div>
             </div>

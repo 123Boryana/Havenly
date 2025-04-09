@@ -13,7 +13,7 @@ export default function Settings() {
         e.preventDefault();
         try{
             setLoading(true);
-            const {data} = await axios.put("/update-password", {
+            const {data} = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/update-password`, {
                 password,
             });
             if(data?.error){

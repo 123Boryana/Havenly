@@ -21,7 +21,7 @@ export default function Agent() {
 
     const fetchAgent = async () => {
         try{
-            const {data} = await axios.get(`/agent/${params.username}`);
+            const {data} = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/agent/${params.username}`);
             setAgent(data.user);
             setAds(data.ads);
             setLoading(false);

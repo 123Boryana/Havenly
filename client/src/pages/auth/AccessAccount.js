@@ -17,7 +17,7 @@ export default function AccessAccount() {
 
 const requestAccess = async () => {
     try{
-        const { data } = await axios.post(`/access-account`, { resetCode: token, });
+        const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/access-account`, { resetCode: token, });
         if(data?.error){
             toast.error(data.error);
         } else {

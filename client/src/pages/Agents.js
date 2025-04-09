@@ -15,7 +15,7 @@ export default function Agents() {
 
   const fetchAgents = async () => {
     try {
-      const { data } = await axios.get("/agents");
+      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/agents`);
       setAgents(data);
       setLoading(false);
     } catch (err) {

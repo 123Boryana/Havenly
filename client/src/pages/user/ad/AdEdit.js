@@ -39,7 +39,7 @@ export default function AdEdit({ action, type }) {
 
   const fetchAd = async () => {
     try{
-        const {data} = await axios.get(`/ad/${params.slug}`);
+        const {data} = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/ad/${params.slug}`);
         //console.log("single ad edit page =>", data);
         setAd(data?.ad);
         setLoaded(true);

@@ -19,7 +19,7 @@ export default function Rent() {
 
     const fetchAds = async () => {
         try{
-            const {data} = await axios.get("/ads-for-rent");
+            const {data} = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/ads-for-rent`);
             setAds(data)
         } catch (err) {
             console.log(err);

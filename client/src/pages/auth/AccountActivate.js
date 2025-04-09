@@ -17,7 +17,7 @@ export default function AccountActivate() {
 
 const requestActivation = async () => {
     try{
-        const {data} = await axios.post(`/register`, { token });
+        const {data} = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/register`, { token });
         if(data?.error){
             toast.error(data.error);
         } else {

@@ -29,7 +29,7 @@ export default function AdCreate() {
         <div className="col-lg-6">
           <button
             onClick={handleSell}
-            className="btn btn -primary btn-lg col-12 p-5"
+            className="btn btn-primary btn-lg col-12 p-5"
           >
             <span className="h2">Продай</span>
           </button>
@@ -54,7 +54,7 @@ export default function AdCreate() {
         <div className="col-lg-6">
           <button
             onClick={handleRent}
-            className="btn btn -primary btn-lg col-12 p-5"
+            className="btn btn-primary btn-lg col-12 p-5"
           >
             <span className="h2">Под наем</span>
           </button>

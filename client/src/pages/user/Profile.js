@@ -38,7 +38,7 @@ export default function Profile() {
         e.preventDefault();
         try{
             setLoading(true);
-            const {data} = await axios.put("/update-profile", {
+            const {data} = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/update-profile`, {
                 username,
                 name,
                 email,

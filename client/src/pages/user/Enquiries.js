@@ -16,7 +16,7 @@ export default function Enquiries() {
 
   const fetchAds = async () => {
     try {
-      const { data } = await axios.get(`/enquired-properties`);
+      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/enquired-properties`);
       setAds(data);
     } catch (err) {
       console.log(err);

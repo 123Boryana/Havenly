@@ -19,7 +19,7 @@ export default function Login() {
         try {
             //console.log( email, password );
             setLoading(true);
-            const {data} = await axios.post(`/forgot-password`, {
+            const {data} = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/forgot-password`, {
                 email,
             });
             if(data.error) {

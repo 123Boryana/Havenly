@@ -23,7 +23,7 @@ useEffect(() => {
 
 const fetchAds = async () => {
     try {
-       const {data} = await axios.get(`/user-ads/${page}`);
+       const {data} = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/user-ads/${page}`);
        setAds([...ads, ...data.ads]);
        setTotal(data.total);
     } catch (err){

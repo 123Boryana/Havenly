@@ -16,7 +16,7 @@ export default function Wishlist() {
 
   const fetchAds = async () => {
     try {
-      const { data } = await axios.get(`/wishlist`);
+      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/wishlist`);
       setAds(data);
     } catch (err) {
       console.log(err);
