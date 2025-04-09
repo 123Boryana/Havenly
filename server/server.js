@@ -22,21 +22,22 @@ mongoose
 app.use(express.json({ limit: "10mb" }));
 app.use(morgan("dev"));
 
-const allowedOrigins = [
-  "https://havenly-git-main-boryana-projects-ta330183.vercel.app",
-  "https://havenly-frontend-admqo75jv-boryanas-projects-1a330183.vercel.app",
-  "http://localhost:3000", 
-  "http://localhost:5173"  
-];
-
+// CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+
+    if (origin === "http://localhost:3000" || origin === "http://localhost:5173") {
       return callback(null, true);
-    } else {
-      return callback(new Error("Not allowed by CORS"));
     }
+
+    if (origin.endsWith("boryanas-projects-1a330183.vercel.app")) {
+      return callback(null, true);
+    }
+
+    
+    console.log(`CORS error: Origin ${origin} not allowed`);
+    return callback(new Error("Not allowed by CORS"));
   }
 }));
 
