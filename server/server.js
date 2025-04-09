@@ -15,15 +15,20 @@ mongoose
   .then(() => console.log("db_connected"))
   .catch((err) => console.log(err));
 
+  app.get("/", (req, res) => {
+    console.log("Root route accessed");
+    res.json({ message: "Backend is running!" });
+  });
+
 // middlewares
 app.use(express.json({ limit: "10mb" }));
 app.use(morgan("dev"));
 app.use(cors({
-  origin: "https://havenly-git-main-boryana-projects-ta330183.vercel.app" 
+  origin: "https://havenly-git-main-boryana-projects-ta330183.vercel.app"
 }));
 // routes middleware
 app.use("/api", authRoutes);
 app.use("/api", adRoutes);
 
-const PORT = process.env.PORT || 8000; // Use Vercel's PORT
+const PORT = process.env.PORT || 8000; 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
