@@ -1,6 +1,5 @@
 import * as config from "../config.js";
 import jwt from "jsonwebtoken";
-
 import { hashPassword, comparePassword } from "../helpers/auth.js";
 import User from "../models/user.js";
 import { nanoid } from "nanoid";
@@ -33,12 +32,10 @@ export const welcome = (req, res) => {
 };
 
 export const preRegister = async (req, res) => {
-  // create jwt with email and password then email as clickable link
-  // only when user click on that email link, registeration completes
   try {
     const { email, password } = req.body;
 
-    // validataion
+    // Validation
     if (!validator.validate(email)) {
       return res.json({ error: "Въведете валиден имейл" });
     }
@@ -49,14 +46,17 @@ export const preRegister = async (req, res) => {
       return res.json({ error: "Паролата трябва да съдържа поне 6 символа" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (user) {
       return res.json({ error: "Имейлът е зает" });
     }
 
-    const token = jwt.sign({ email, password }, config.JWT_SECRET, {
+    const token = jwt.sign({ email: email.toLowerCase(), password }, config.JWT_SECRET, {
       expiresIn: "1h",
     });
+
+    // Log the CLIENT_URL to confirm it's correct
+    console.log("CLIENT_URL in preRegister:", config.CLIENT_URL);
 
     // Email content
     const emailParams = {
@@ -98,11 +98,13 @@ export const preRegister = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    // console.log(req.body);
+    console.log("Register token:", req.body.token);
     const { email, password } = jwt.verify(req.body.token, config.JWT_SECRET);
+    console.log("Register email:", email);
 
-    const userExist = await User.findOne({ email });
+    const userExist = await User.findOne({ email: email.toLowerCase() });
     if (userExist) {
+      console.log("User already exists:", email);
       return res.json({ error: "Имейлът е зает" });
     }
 
@@ -110,13 +112,14 @@ export const register = async (req, res) => {
 
     const user = await new User({
       username: nanoid(6),
-      email,
+      email: email.toLowerCase(),
       password: hashedPassword,
     }).save();
+    console.log("User registered:", user);
 
     tokenAndUserResponse(req, res, user);
   } catch (err) {
-    console.log(err);
+    console.log("Register error:", err);
     return res.json({ error: "Нещо се обърка. Опитайте отново." });
   }
 };
@@ -124,9 +127,11 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if(!user) {
-      return res.json({error: "Не беше намерен такъв потребител. Моля направете регистрация."})
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.json({
+        error: "Не беше намерен такъв потребител. Моля направете регистрация.",
+      });
     }
     const match = await comparePassword(password, user.password);
     if (!match) {
@@ -196,7 +201,6 @@ export const forgotPassword = async (req, res) => {
     return res.json({ error: "Нещо се обърка. Опитайте отново." });
   }
 };
-
 
 export const accessAccount = async (req, res) => {
   try {
@@ -302,7 +306,6 @@ export const agents = async (req, res) => {
 export const agentAdCount = async (req, res) => {
   try {
     const ads = await Ad.find({ postedBy: req.params._id }).select("_id");
-    // console.log("ads count => ", ads);
     res.json(ads);
   } catch (err) {
     console.log(err);

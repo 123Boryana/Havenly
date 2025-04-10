@@ -8,7 +8,6 @@ import User from "../models/user.js";
 
 export const uploadImage = async (req, res) => {
   try {
-    // console.log(req.body);
     const { image } = req.body;
 
     const base64Image = new Buffer.from(
@@ -36,7 +35,6 @@ export const uploadImage = async (req, res) => {
       console.log(err);
       res.sendStatus(400);
     }
-
   } catch (err) {
     console.log(err);
     res.json({ error: "Upload failed. Try again." });
@@ -49,7 +47,7 @@ export const removeImage = async (req, res) => {
 
     try {
       const result = await AWSS3.send(new DeleteObjectCommand({ Bucket, Key }));
-      console.log("Delete result:", result); // Optional debugging
+      console.log("Delete result:", result);
       res.send({ ok: true });
     } catch (err) {
       console.error("Error deleting image:", err);
@@ -62,26 +60,24 @@ export const removeImage = async (req, res) => {
 
 export const create = async (req, res) => {
   try {
-    //console.log(req.body);
-    const {photos, description, title, address, price, type, landsize} = req.body;
+    const { photos, description, title, address, price, type, landsize } = req.body;
     if (!photos.length) {
-      return res.json({error: "Въведете снимки"});
+      return res.json({ error: "Въведете снимки" });
     }
     if (!price) {
-      return res.json({error: "Въведете цена"});
+      return res.json({ error: "Въведете цена" });
     }
     if (!type) {
-      return res.json({error: "Въведете вид на имота"});
+      return res.json({ error: "Въведете вид на имота" });
     }
     if (!address) {
-      return res.json({error: "Въведете адрес"});
+      return res.json({ error: "Въведете адрес" });
     }
     if (!description) {
-      return res.json({error: "Въведете описание"});
+      return res.json({ error: "Въведете описание" });
     }
 
     const geo = await GOOGLE_GEOCODER.geocode(address);
-    //console.log("geo =>", geo);
     const ad = await new Ad({
       ...req.body,
       postedBy: req.user._id,
@@ -90,42 +86,44 @@ export const create = async (req, res) => {
         coordinates: [geo?.[0]?.longitude, geo?.[0]?.latitude],
       },
       googleMap: geo,
-      slug: slugify(`${title}-${address}-${price}-${nanoid(6)}`), 
+      slug: slugify(`${title}-${address}-${price}-${nanoid(6)}`),
     }).save();
 
-    //make user role > Seller
-    const user = await User.findByIdAndUpdate(req.user._id, {
-      $addToSet: {role: "Seller" },
-    },
-    {new: true}
-  );
+    // Make user role > Seller
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $addToSet: { role: "Seller" },
+      },
+      { new: true }
+    );
 
-  user.password = undefined;
-  user.resetCode = undefined;
+    user.password = undefined;
+    user.resetCode = undefined;
 
-  res.json({
-    ad,
-    user,
-  });
+    res.json({
+      ad,
+      user,
+    });
   } catch (err) {
-    res.json({ error: "Нещо се обърка. Опитайте отново."});
+    res.json({ error: "Нещо се обърка. Опитайте отново." });
     console.log(err);
   }
 };
 
 export const ads = async (req, res) => {
-  try{
-    const adsForSell = await Ad.find({action: "Sell"})
+  try {
+    const adsForSell = await Ad.find({ action: "Sell" })
       .select("-googleMap -location")
-      .sort({createdAt: -1 })
+      .sort({ createdAt: -1 })
       .limit(12);
 
-    const adsForRent = await Ad.find({action: "Rent"})
+    const adsForRent = await Ad.find({ action: "Rent" })
       .select("-googleMap -location")
-      .sort({createdAt: -1 })
+      .sort({ createdAt: -1 })
       .limit(12);
 
-      res.json({ adsForSell, adsForRent });
+    res.json({ adsForSell, adsForRent });
   } catch (err) {
     console.log(err);
   }
@@ -133,50 +131,56 @@ export const ads = async (req, res) => {
 
 export const read = async (req, res) => {
   try {
-    const ad = await Ad.findOne({slug: req.params.slug}).populate(
+    const ad = await Ad.findOne({ slug: req.params.slug }).populate(
       "postedBy",
       "name username email phone company photo"
     );
 
     const related = await Ad.find({
-      _id: {$ne: ad._id},
+      _id: { $ne: ad._id },
       action: ad.action,
       type: ad.type,
       address: {
-        $regex: ad.googleMap[0]?.city || "", 
+        $regex: ad.googleMap[0]?.city || "",
         $options: "i",
       },
-    }).limit(3).select("-googleMap");
+    })
+      .limit(3)
+      .select("-googleMap");
 
-    res.json({ad, related});
+    res.json({ ad, related });
   } catch (err) {
     console.log(err);
   }
 };
 
 export const addToWishlist = async (req, res) => {
-  try{
-    const user = await User.findByIdAndUpdate(req.user._id, {
-      $addToSet: {wishlist: req.body.adId},
-    }, {new: true}
-  );
-  const {password, resetCode, ...rest} = user._doc;
-  res.json(rest);
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $addToSet: { wishlist: req.body.adId },
+      },
+      { new: true }
+    );
+    const { password, resetCode, ...rest } = user._doc;
+    res.json(rest);
   } catch (err) {
     console.log(err);
   }
 };
 
 export const removeFromWishlist = async (req, res) => {
-  try{
+  try {
     const user = await User.findByIdAndUpdate(
-      req.user._id, {
-      $pull: {wishlist: req.params.adId},
-    }, 
-      {new: true}
-  );
-  const {password, resetCode, ...rest} = user._doc;
-  res.json(rest);
+      req.user._id,
+      {
+        $pull: { wishlist: req.params.adId },
+      },
+      { new: true }
+    );
+    const { password, resetCode, ...rest } = user._doc;
+    res.json(rest);
   } catch (err) {
     console.log(err);
   }
@@ -184,15 +188,15 @@ export const removeFromWishlist = async (req, res) => {
 
 export const contactSeller = async (req, res) => {
   try {
-    const {name, email, message, phone, adId} = req.body;
+    const { name, email, message, phone, adId } = req.body;
     const ad = await Ad.findById(adId).populate("postedBy", "email");
 
     const user = await User.findByIdAndUpdate(req.user._id, {
-      $addToSet: {enquiredProperties: adId},
+      $addToSet: { enquiredProperties: adId },
     });
-    
-    if(!user) {
-      return res.json({error: "Не намерихме потребител с този имейл адрес."});
+
+    if (!user) {
+      return res.json({ error: "Не намерихме потребител с този имейл адрес." });
     } else {
       const emailParams = {
         Destination: {
@@ -219,16 +223,16 @@ export const contactSeller = async (req, res) => {
         Source: email,
         ReplyToAddresses: [email],
       };
-      //send email
-       try {
-            const sendEmailCommand = new SendEmailCommand(emailParams);
-            const data = await AWSSES.send(sendEmailCommand);
-            console.log("Email sent successfully:", data);
-            return res.json({ ok: true });
-          } catch (err) {
-            console.error("Error sending email:", err);
-            return res.json({ ok: false, error: "Имейлът не се изпрати. Опитайте отново." });
-          }
+      // Send email
+      try {
+        const sendEmailCommand = new SendEmailCommand(emailParams);
+        const data = await AWSSES.send(sendEmailCommand);
+        console.log("Email sent successfully:", data);
+        return res.json({ ok: true });
+      } catch (err) {
+        console.error("Error sending email:", err);
+        return res.json({ ok: false, error: "Имейлът не се изпрати. Опитайте отново." });
+      }
     }
   } catch (err) {
     console.log(err);
@@ -255,31 +259,31 @@ export const userAds = async (req, res) => {
 };
 
 export const update = async (req, res) => {
-  try{
-    const {photos, price, type, address, description} = req.body;
-    
+  try {
+    const { photos, price, type, address, description } = req.body;
+
     const ad = await Ad.findById(req.params._id);
 
     const owner = req.user._id == ad?.postedBy;
 
-    if(!owner){
-      return res.json({error: "Нямате разрешение"});
+    if (!owner) {
+      return res.json({ error: "Нямате разрешение" });
     } else {
-      //validation
-      if(!photos.length) {
-        return res.json({error: "Сложете снимки"});
+      // Validation
+      if (!photos.length) {
+        return res.json({ error: "Сложете снимки" });
       }
-      if(!price) {
-        return res.json({error: "Въведете цена"});
+      if (!price) {
+        return res.json({ error: "Въведете цена" });
       }
-      if(!type) {
-        return res.json({error: "Въведете вид на имота"});
+      if (!type) {
+        return res.json({ error: "Въведете вид на имота" });
       }
-      if(!address) {
-        return res.json({error: "Въведете адрес"});
+      if (!address) {
+        return res.json({ error: "Въведете адрес" });
       }
-      if(!description) {
-        return res.json({error: "Въведете описание"});
+      if (!description) {
+        return res.json({ error: "Въведете описание" });
       }
 
       const geo = await GOOGLE_GEOCODER.geocode(address);
@@ -294,7 +298,7 @@ export const update = async (req, res) => {
       });
       await ad.save();
 
-      res.json({ok:true});
+      res.json({ ok: true });
     }
   } catch (err) {
     console.log(err);
@@ -326,43 +330,50 @@ export const wishlist = async (req, res) => {
 };
 
 export const remove = async (req, res) => {
-  try{
+  try {
     const ad = await Ad.findById(req.params._id);
     const owner = req.user._id == ad?.postedBy;
- 
-    if(!owner){
-      return res.json({error: "Нямате разрешение"});
+
+    if (!owner) {
+      return res.json({ error: "Нямате разрешение" });
     } else {
       await Ad.findByIdAndDelete(ad._id);
-      res.json({ok:true});
+      res.json({ ok: true });
     }
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   }
 };
 
 export const adsForSale = async (req, res) => {
-  try{
-    const ads = await Ad.find({action: "Sell"})
+  try {
+    console.log("Fetching ads for sale...");
+    const ads = await Ad.find({ action: { $regex: "^Sell$", $options: "i" } })
       .select("-googleMap -location")
-      .sort({createdAt: -1 })
+      .sort({ createdAt: -1 })
       .limit(24);
+    console.log("Ads found:", ads);
 
-      res.json(ads);
+    res.json(ads);
   } catch (err) {
-    console.log(err);
+    console.log("Error in adsForSale:", err);
+    res.status(500).json({ error: "Нещо се обърка. Опитайте отново." });
   }
 };
-export const adsForRent = async (req, res) => {
-  try{
-    const ads = await Ad.find({action: "Rent"})
-      .select("-googleMap -location")
-      .sort({createdAt: -1 })
-      .limit(24);
 
-      res.json(ads);
+export const adsForRent = async (req, res) => {
+  try {
+    console.log("Fetching ads for rent...");
+    const ads = await Ad.find({ action: { $regex: "^Rent$", $options: "i" } })
+      .select("-googleMap -location")
+      .sort({ createdAt: -1 })
+      .limit(24);
+    console.log("Ads found:", ads);
+
+    res.json(ads);
   } catch (err) {
-    console.log(err);
+    console.log("Error in adsForRent:", err);
+    res.status(500).json({ error: "Нещо се обърка. Опитайте отново." });
   }
 };
 
@@ -372,7 +383,6 @@ export const search = async (req, res) => {
     const { action, address, type, priceRange } = req.query;
 
     const geo = await GOOGLE_GEOCODER.geocode(address);
-    // console.log("geo => ", geo);
 
     const ads = await Ad.find({
       action: action === "Buy" ? "Sell" : "Rent",
@@ -393,12 +403,9 @@ export const search = async (req, res) => {
     })
       .limit(24)
       .sort({ createdAt: -1 })
-      .select(
-        "-location -googleMap"
-      );
-    // console.log(ads);
+      .select("-location -googleMap");
     res.json(ads);
   } catch (err) {
-    console.log();
+    console.log(err);
   }
 };
