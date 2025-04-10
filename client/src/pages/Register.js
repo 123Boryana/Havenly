@@ -16,7 +16,7 @@ export default function Register() {
     e.preventDefault();
     try {
       setLoading(true);
-      const { data } = await api.post("/pre-register", {
+      const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/pre-register`, {
         email,
         password,
       });
