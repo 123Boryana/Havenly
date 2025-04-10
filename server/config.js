@@ -40,4 +40,4 @@ const options = {
 export const GOOGLE_GEOCODER = NodeGeocoder(options);
 
 export const JWT_SECRET = process.env.JWT_SECRET;
-export const CLIENT_URL = "http://localhost:3000";
+export const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
