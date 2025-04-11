@@ -15,7 +15,7 @@ export default function PrivateRoute() {
 
   const getCurrentUser = async () => {
     try {
-      const { data } = await axios.get("/current-user", {
+      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/current-user`, {
         headers: {
           Authorization: auth?.token,
         },

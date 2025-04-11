@@ -34,7 +34,7 @@ const AuthProvider = ({ children }) => {
           originalConfig._retry = true;
 
           try {
-            const { data } = await axios.get("/refresh-token");
+            const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/refresh-token`);
             axios.defaults.headers.common["token"] = data.token;
             axios.defaults.headers.common["refresh_token"] = data.refreshToken;
 
