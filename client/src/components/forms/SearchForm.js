@@ -18,7 +18,7 @@ export default function SearchForm() {
       const { results, page, price, ...rest } = search;
       const query = queryString.stringify(rest);
 
-      const { data } = await axios.get(`/search?${query}`);
+      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/search?${query}`);
 
       if (search?.page !== "/search") {
         setSearch((prev) => ({ ...prev, results: data, loading: false }));

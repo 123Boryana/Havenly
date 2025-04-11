@@ -18,7 +18,7 @@ export default function UserCard({ user }) {
 
   const fetchAdCount = async () => {
     try {
-      const { data } = await axios.get(`/agents-ad-count/${user._id}`);
+      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/agents-ad-count/${user._id}`);
       setCount(data.length);
     } catch (err) {
       console.log(err);

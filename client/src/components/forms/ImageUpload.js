@@ -23,7 +23,7 @@ export default function ImageUpload({ ad, setAd }) {
               async (uri) => {
                 try {
                   // console.log("UPLOAD URI => ", uri);
-                  const { data } = await axios.post("/upload-image", {
+                  const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/upload-image`, {
                     image: uri,
                   });
                   setAd((prev) => ({

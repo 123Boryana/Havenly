@@ -13,8 +13,6 @@ export default function ContactSeller({ad}) {
     const [message, setMessage] = useState("");
     const [phone, setPhone] = useState("");
     const [loading, setLoading] = useState("");
-    //hooks
-    const navigate = useNavigate();
 
     const loggedIn = auth.user !== null && auth.token !== "";
 
@@ -30,7 +28,7 @@ export default function ContactSeller({ad}) {
         e.preventDefault();
         setLoading(true);
         try{
-            const { data } = await axios.post("/contact-seller", {
+            const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/contact-seller`, {
                 name,
                 email,
                 message,

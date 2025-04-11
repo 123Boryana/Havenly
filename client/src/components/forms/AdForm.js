@@ -34,7 +34,7 @@ export default function AdForm({ action, type }) {
   const handleClick = async () => {
     try {
       setAd({...ad, loading: true});
-      const {data} = await axios.post("/ad", ad);
+      const {data} = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/ad`, ad);
       console.log("ad create response =>", data);
       if(data.error) {
         toast.error(data.error)

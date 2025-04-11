@@ -23,7 +23,7 @@ export default function ProfileUpload({ photo, setPhoto, uploading, setUploading
           0,
           async (uri) => {
             try {
-              const { data } = await axios.post("/upload-image", { image: uri });
+              const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/upload-image`, { image: uri });
               console.log("Upload response:", data); // Debugging response
               setPhoto(data.location); // Update photo state with the image URL
               setUploading(false);
@@ -52,7 +52,7 @@ export default function ProfileUpload({ photo, setPhoto, uploading, setUploading
       const key = photo.split("https://havenly-bucket.s3.amazonaws.com/")[1];
       const bucket = "havenly-bucket";
   
-      const { data } = await axios.post("/remove-image", { Key: key, Bucket: bucket });
+      const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/remove-image`, { Key: key, Bucket: bucket });
   
       if (data?.ok) {
         setPhoto(null);
