@@ -13,13 +13,13 @@ export default function SearchForm() {
   const handleSearch = async () => {
     setSearch({ ...search, loading: true });
     try {
-      const { results, page, ...rest } = search
+      const { results, page, ...rest } = search;
       if (rest.priceRange) {
         rest.priceRange = JSON.stringify(rest.priceRange);
       }
       const query = queryString.stringify(rest, { skipNull: true });
 
-      console.log("Search query:", query); 
+      console.log("Search query:", query);
       const { data } = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/search?${query}`
       );
@@ -52,6 +52,18 @@ export default function SearchForm() {
 
   return (
     <div className="container mt-2 mb-5">
+      <style>
+        {`
+          .price-dropdown .dropdown-item {
+            color: black !important;
+          }
+          .price-dropdown .dropdown-item:hover {
+            background-color: #f8f9fa; 
+            color: black !important; 
+          }
+        `}
+      </style>
+
       <div className="row">
         <div className="col-lg-12 form-control">
           <GooglePlacesAutocomplete
@@ -105,7 +117,7 @@ export default function SearchForm() {
           >
             {search?.price || "Цена"}
           </button>
-          <ul className="dropdown-menu">
+          <ul className="dropdown-menu price-dropdown">
             {search.action === "Buy" ? (
               sellPrices?.map((p) => (
                 <li key={p._id}>
