@@ -16,7 +16,7 @@ export default function LikeUnlike({ad}) {
                 });
                 return;
             }
-            const {data} = await axios.post("/wishlist", {adId: ad._id});
+            const {data} = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/wishlist`, {adId: ad._id});
             console.log("handle like =>", data);
             setAuth({...auth, user: data});
             const fromLS = JSON.parse(localStorage.getItem("auth"));
@@ -36,7 +36,7 @@ export default function LikeUnlike({ad}) {
                 });
                 return;
             }
-            const {data} = await axios.delete(`/wishlist/${ad._id}`);
+            const {data} = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/wishlist/${ad._id}`);
             console.log("handle unlike =>", data);
             setAuth({...auth, user: data});
             const fromLS = JSON.parse(localStorage.getItem("auth"));

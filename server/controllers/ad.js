@@ -379,24 +379,39 @@ export const adsForRent = async (req, res) => {
 
 export const search = async (req, res) => {
   try {
-    console.log("req query", req.query);
+    console.log("Search query:", req.query); 
     const { action, address, type, priceRange } = req.query;
 
+    if (!address) {
+      return res.status(400).json({ error: "Моля, въведете адрес" });
+    }
+
     const geo = await GOOGLE_GEOCODER.geocode(address);
+    if (!geo || geo.length === 0) {
+      return res.status(400).json({ error: "Невалиден адрес" });
+    }
+
+    let minPrice = 0;
+    let maxPrice = Number.MAX_SAFE_INTEGER;
+    if (priceRange) {
+      const priceArray = JSON.parse(priceRange); 
+      minPrice = parseInt(priceArray[0]) || 0;
+      maxPrice = parseInt(priceArray[1]) || Number.MAX_SAFE_INTEGER;
+    }
 
     const ads = await Ad.find({
       action: action === "Buy" ? "Sell" : "Rent",
-      type,
+      type: type || { $in: ["House", "Land"] }, 
       price: {
-        $gte: parseInt(priceRange[0]),
-        $lte: parseInt(priceRange[1]),
+        $gte: minPrice,
+        $lte: maxPrice,
       },
       location: {
         $near: {
-          $maxDistance: 20000, // 1000m = 1km
+          $maxDistance: 20000, 
           $geometry: {
             type: "Point",
-            coordinates: [geo?.[0]?.longitude, geo?.[0]?.latitude],
+            coordinates: [geo[0].longitude, geo[0].latitude],
           },
         },
       },
@@ -404,8 +419,11 @@ export const search = async (req, res) => {
       .limit(24)
       .sort({ createdAt: -1 })
       .select("-location -googleMap");
+
+    console.log("Found ads:", ads.length); 
     res.json(ads);
   } catch (err) {
-    console.log(err);
+    console.error("Search error:", err);
+    res.status(500).json({ error: "Грешка при търсене. Моля, опитайте отново." });
   }
 };

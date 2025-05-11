@@ -23,25 +23,6 @@ app.use(express.json({ limit: "10mb" }));
 app.use(morgan("dev"));
 app.use(cors());
 
-// CORS configuration
-// app.use(cors({
-//   origin: (origin, callback) => {
-//     if (!origin) return callback(null, true);
-
-//     if (origin === "http://localhost:3000" || origin === "http://localhost:5173") {
-//       return callback(null, true);
-//     }
-
-//     if (origin.endsWith("boryanas-projects-1a330183.vercel.app")) {
-//       return callback(null, true);
-//     }
-
-    
-//     console.log(`CORS error: Origin ${origin} not allowed`);
-//     return callback(new Error("Not allowed by CORS"));
-//   }
-// }));
-
 // Root route to test the server
 app.get("/", (req, res) => {
   console.log("Root route accessed");

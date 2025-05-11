@@ -1,38 +1,28 @@
-import { useSearch } from "../../context/search";
-import GooglePlacesAutocomplete from "react-google-places-autocomplete";
-import { GOOGLE_PLACES_KEY } from "../../config";
-import { sellPrices, rentPrices } from "../../helpers/priceList";
-import queryString from "query-string";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
 export default function SearchForm() {
-  // context
   const [search, setSearch] = useSearch();
-
   const navigate = useNavigate();
 
   const handleSearch = async () => {
-    setSearch({ ...search, loading: false });
+    setSearch({ ...search, loading: true }); 
     try {
-      const { results, page, price, ...rest } = search;
-      const query = queryString.stringify(rest);
+      const { results, page, ...rest } = search;
+      rest.priceRange = rest.priceRange ? rest.priceRange : null;
+      const query = queryString.stringify(rest, { skipNull: true });
 
-      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/search?${query}`);
+      console.log("Search query:", query); 
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/search?${query}`
+      );
 
-      if (search?.page !== "/search") {
-        setSearch((prev) => ({ ...prev, results: data, loading: false }));
-        navigate("/search");
-      } else {
-        setSearch((prev) => ({
-          ...prev,
-          results: data,
-          page: window.location.pathname,
-          loading: false,
-        }));
-      }
+      setSearch((prev) => ({
+        ...prev,
+        results: data,
+        page: "/search",
+        loading: false,
+      }));
+      navigate("/search");
     } catch (err) {
-      console.log(err);
+      console.error("Search error:", err.response?.data || err.message);
       setSearch({ ...search, loading: false });
     }
   };
@@ -44,20 +34,21 @@ export default function SearchForm() {
       type: "House",
       price: "",
       priceRange: null,
+      results: [],
+      page: "",
       loading: false,
     });
   };
 
   return (
     <div className="container mt-2 mb-5">
-      {/* Address Search */}
       <div className="row">
         <div className="col-lg-12 form-control">
           <GooglePlacesAutocomplete
             apiKey={GOOGLE_PLACES_KEY}
-            apiOptions="bg"
+            apiOptions={{ language: "bg", region: "BG" }}
             selectProps={{
-              defaultInputValue: search?.address,
+              defaultInputValue: search?.address || "",
               placeholder: "Потърсете адрес...",
               onChange: ({ value }) =>
                 setSearch({ ...search, address: value.description }),
@@ -66,47 +57,35 @@ export default function SearchForm() {
         </div>
       </div>
 
-      {/* Action and Type Buttons */}
       <div className="d-flex justify-content-center mt-3 gap-2">
-        {/* Action Buttons */}
         <button
-          onClick={() => setSearch({ ...search, action: "Buy", price: "" })}
-          className={`btn ${
-            search.action === "Buy" ? "btn-success" : "btn-outline-success"
-          } col-lg-2 mr-1`}
+          onClick={() => setSearch({ ...search, action: "Buy", price: "", priceRange: null })}
+          className={`btn ${search.action === "Buy" ? "btn-success" : "btn-outline-success"} col-lg-2 mr-1`}
         >
-          {search.action === "Buy" ? "Купуване" : "Купуване"}
+          Купуване
         </button>
 
         <button
-          onClick={() => setSearch({ ...search, action: "Rent", price: "" })}
-          className={`btn ${
-            search.action === "Rent" ? "btn-success" : "btn-outline-success"
-          } col-lg-2 mr-1`}
+          onClick={() => setSearch({ ...search, action: "Rent", price: "", priceRange: null })}
+          className={`btn ${search.action === "Rent" ? "btn-success" : "btn-outline-success"} col-lg-2 mr-1`}
         >
-          {search.action === "Rent" ? "Под наем" : "Под наем"}
-        </button>
-
-        {/* Type Buttons */}
-        <button
-          onClick={() => setSearch({ ...search, type: "House", price: "" })}
-          className={`btn ${
-            search.type === "House" ? "btn-primary" : "btn-outline-primary"
-          } col-lg-2 mr-1`}
-        >
-          {search.type === "House" ? "Къща" : "Къща"}
+          Под наем
         </button>
 
         <button
-          onClick={() => setSearch({ ...search, type: "Land", price: "" })}
-          className={`btn ${
-            search.type === "Land" ? "btn-primary" : "btn-outline-primary"
-          } col-lg-2 mr-1`}
+          onClick={() => setSearch({ ...search, type: "House", price: "", priceRange: null })}
+          className={`btn ${search.type === "House" ? "btn-primary" : "btn-outline-primary"} col-lg-2 mr-1`}
         >
-          {search.type === "Land" ? "Земя" : "Земя"}
+          Къща
         </button>
 
-        {/* Price Dropdown */}
+        <button
+          onClick={() => setSearch({ ...search, type: "Land", price: "", priceRange: null })}
+          className={`btn ${search.type === "Land" ? "btn-primary" : "btn-outline-primary"} col-lg-2 mr-1`}
+        >
+          Земя
+        </button>
+
         <div className="dropdown">
           <button
             className="btn btn-warning dropdown-toggle mr-1"
@@ -114,57 +93,51 @@ export default function SearchForm() {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            &nbsp; {search?.price ? search.price : "Цена"}
+            {search?.price || "Цена"}
           </button>
           <ul className="dropdown-menu">
             {search.action === "Buy" ? (
-              <>
-                {sellPrices?.map((p) => (
-                  <li key={p._id}>
-                    <a
-                      className="dropdown-item"
-                      onClick={() =>
-                        setSearch({
-                          ...search,
-                          price: p.name,
-                          priceRange: p.array,
-                        })
-                      }
-                    >
-                      {p.name}
-                    </a>
-                  </li>
-                ))}
-              </>
+              sellPrices?.map((p) => (
+                <li key={p._id}>
+                  <a
+                    className="dropdown-item"
+                    onClick={() =>
+                      setSearch({
+                        ...search,
+                        price: p.name,
+                        priceRange: p.array,
+                      })
+                    }
+                  >
+                    {p.name}
+                  </a>
+                </li>
+              ))
             ) : (
-              <>
-                {rentPrices?.map((p) => (
-                  <li key={p._id}>
-                    <a
-                      className="dropdown-item"
-                      onClick={() =>
-                        setSearch({
-                          ...search,
-                          price: p.name,
-                          priceRange: p.array,
-                        })
-                      }
-                    >
-                      {p.name}
-                    </a>
-                  </li>
-                ))}
-              </>
+              rentPrices?.map((p) => (
+                <li key={p._id}>
+                  <a
+                    className="dropdown-item"
+                    onClick={() =>
+                      setSearch({
+                        ...search,
+                        price: p.name,
+                        priceRange: p.array,
+                      })
+                    }
+                  >
+                    {p.name}
+                  </a>
+                </li>
+              ))
             )}
           </ul>
         </div>
 
-        {/* Search Button */}
         <button onClick={handleSearch} className="btn btn-danger col-lg-2 mr-1">
           Потърси
         </button>
 
-        {/* Clear Button */}
         <button onClick={clearFilters} className="btn btn-primary col-lg-2 mr-1">
           Изчисти
         </button>
