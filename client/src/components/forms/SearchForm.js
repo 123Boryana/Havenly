@@ -11,14 +11,15 @@ export default function SearchForm() {
   const navigate = useNavigate();
 
   const handleSearch = async () => {
-    setSearch({ ...search, loading: true }); // Задай loading: true преди заявката
+    setSearch({ ...search, loading: true });
     try {
-      const { results, page, ...rest } = search;
-      // Увери се, че priceRange е масив или null
-      rest.priceRange = rest.priceRange ? rest.priceRange : null;
+      const { results, page, ...rest } = search
+      if (rest.priceRange) {
+        rest.priceRange = JSON.stringify(rest.priceRange);
+      }
       const query = queryString.stringify(rest, { skipNull: true });
 
-      console.log("Search query:", query); // Добави дебъг за заявката
+      console.log("Search query:", query); 
       const { data } = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/search?${query}`
       );

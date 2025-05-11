@@ -394,9 +394,14 @@ export const search = async (req, res) => {
     let minPrice = 0;
     let maxPrice = Number.MAX_SAFE_INTEGER;
     if (priceRange) {
-      const priceArray = JSON.parse(priceRange); 
-      minPrice = parseInt(priceArray[0]) || 0;
-      maxPrice = parseInt(priceArray[1]) || Number.MAX_SAFE_INTEGER;
+      try {
+        const priceArray = JSON.parse(priceRange); 
+        minPrice = parseInt(priceArray[0]) || 0;
+        maxPrice = parseInt(priceArray[1]) || Number.MAX_SAFE_INTEGER;
+      } catch (err) {
+        console.error("Invalid priceRange format:", priceRange);
+        return res.status(400).json({ error: "Невалиден ценови диапазон" });
+      }
     }
 
     const ads = await Ad.find({
@@ -420,7 +425,7 @@ export const search = async (req, res) => {
       .sort({ createdAt: -1 })
       .select("-location -googleMap");
 
-    console.log("Found ads:", ads.length); 
+    console.log("Found ads:", ads.length);
     res.json(ads);
   } catch (err) {
     console.error("Search error:", err);
