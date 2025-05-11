@@ -31,7 +31,7 @@ export default function Settings() {
 
     return (
         <>
-            <h1 className="display-1 bg-primary text-light p-5">Настройки</h1>
+            <h1 className="display-1 bg-primary text-light p-3">Настройки</h1>
         
             <div className="container-fluid">
                 <div className="container mt-2">
