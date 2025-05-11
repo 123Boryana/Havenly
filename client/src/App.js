@@ -3,7 +3,7 @@ import { AuthProvider } from "./context/auth";
 import { SearchProvider } from "./context/search";
 import Main from "./components/nav/Main";
 import { Toaster } from "react-hot-toast";
-import Layout from "./Layout"; // Импортираме новия Layout компонент
+import Layout from "./components/nav/Layout"; 
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
