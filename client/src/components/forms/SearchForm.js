@@ -1,15 +1,24 @@
+import { useSearch } from "../../context/search";
+import GooglePlacesAutocomplete from "react-google-places-autocomplete";
+import { GOOGLE_PLACES_KEY } from "../../config";
+import { sellPrices, rentPrices } from "../../helpers/priceList";
+import queryString from "query-string";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 export default function SearchForm() {
   const [search, setSearch] = useSearch();
   const navigate = useNavigate();
 
   const handleSearch = async () => {
-    setSearch({ ...search, loading: true }); 
+    setSearch({ ...search, loading: true }); // Задай loading: true преди заявката
     try {
       const { results, page, ...rest } = search;
+      // Увери се, че priceRange е масив или null
       rest.priceRange = rest.priceRange ? rest.priceRange : null;
       const query = queryString.stringify(rest, { skipNull: true });
 
-      console.log("Search query:", query); 
+      console.log("Search query:", query); // Добави дебъг за заявката
       const { data } = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/search?${query}`
       );
