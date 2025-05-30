@@ -20,4 +20,8 @@ router.get("/agents", auth.agents);
 router.get("/agents-ad-count/:_id", auth.agentAdCount);
 router.get("/agent/:username", auth.agent);
 
+router.get("/testimonials", auth.getTestimonials);
+router.post("/testimonials", requireSignin, auth.addTestimonial);
+router.delete("/testimonials/:id", requireSignin, auth.deleteTestimonial);
+
 export default router;

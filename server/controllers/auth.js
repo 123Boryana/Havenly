@@ -325,3 +325,62 @@ export const agent = async (req, res) => {
     console.log(err);
   }
 };
+
+export const getTestimonials = async (req, res) => {
+  try {
+    const testimonials = await Testimonial.find()
+      .populate("user", "username name")
+      .sort({ date: -1 });
+    res.json(testimonials);
+  } catch (error) {
+    console.error("Error fetching testimonials:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const addTestimonial = async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text) {
+      return res.status(400).json({ error: "Text is required" });
+    }
+    const user = await User.findById(req.user._id).select("username name");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const testimonial = new Testimonial({
+      user: user._id,
+      username: user.name || user.username || "Анонимен", 
+      text,
+    });
+    await testimonial.save();
+    const populatedTestimonial = await Testimonial.findById(testimonial._id).populate("user", "username name");
+    res.status(201).json(populatedTestimonial);
+  } catch (error) {
+    console.error("Error posting testimonial:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const deleteTestimonial = async (req, res) => {
+  try {
+    console.log("Deleting testimonial with ID:", req.params.id);
+    const testimonial = await Testimonial.findById(req.params.id);
+    if (!testimonial) {
+      console.log("Testimonial not found for ID:", req.params.id);
+      return res.status(404).json({ error: "Отзивът не е намерен" });
+    }
+    console.log("Current user ID:", req.user._id, "Testimonial user ID:", testimonial.user.toString());
+    if (testimonial.user.toString() !== req.user._id) {
+      console.log("Unauthorized attempt to delete testimonial");
+      return res.status(403).json({ error: "Нямате права да изтриете този отзив" });
+    }
+    await Testimonial.deleteOne({ _id: req.params.id });
+    console.log("Testimonial deleted successfully");
+    res.json({ message: "Отзивът е изтрит успешно" });
+  } catch (error) {
+    console.error("Error deleting testimonial:", error.message);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+};
