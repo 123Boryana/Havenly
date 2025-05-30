@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/auth";
 
-const TestimonialsSection = () => {
+const Testimonials = () => {
     const [auth] = useAuth();
     const [testimonials, setTestimonials] = useState([]);
     const [comment, setComment] = useState("");
@@ -92,7 +92,7 @@ const TestimonialsSection = () => {
                                 <div className="card-body">
                                     <p className="fst-italic mb-2">"{testimonial.text}"</p>
                                     <small className="text-muted d-block text-end">
-                                        - {testimonial.username || "Анонимен"} (
+                                        - {testimonial.name || testimonial.username} (
                                         {new Date(testimonial.date).toLocaleDateString("bg-BG")})
                                     </small>
                                     {auth?.user && (testimonial.user?._id || testimonial.user) === auth.user._id && (
@@ -137,4 +137,4 @@ const TestimonialsSection = () => {
     );
 };
 
-export default TestimonialsSection;
+export default Testimonials;
