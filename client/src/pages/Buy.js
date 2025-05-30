@@ -5,6 +5,7 @@ import AdCard from "../components/cards/AdCard";
 import SearchForm from "../components/forms/SearchForm";
 import Banner from "../components/banner/Banner";
 import bannerPhoto from "../images/handshake-7346772_1280.jpg";
+import Testimonials from "../components/forms/Testimonials";
 
 export default function Buy() {
     // context
@@ -39,6 +40,7 @@ export default function Buy() {
                     ))}
                 </div>
             </div>
+            <Testimonials />
         </div>
     );
 }
