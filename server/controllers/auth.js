@@ -6,6 +6,7 @@ import { nanoid } from "nanoid";
 import validator from "email-validator";
 import { SendEmailCommand } from "@aws-sdk/client-ses";
 import Ad from "../models/ad.js";
+import Testimonial from "../models/testimonial.js";
 
 const tokenAndUserResponse = (req, res, user) => {
   const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
